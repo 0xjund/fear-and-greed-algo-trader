@@ -1,0 +1,12 @@
+# Trade Parameters
+BUY_THRESHOLD = 25
+SELL_THRESHOLD = 75 
+TRADE_PERCENT = 0.1
+
+# Safety
+MIN_BALANCE_ETH = 0.05
+MIN_TRADE_SIZE = 0.01
+
+# Bot settings
+DRY_RUN = True
+CHECK_INTERVAL = 86400 # Daily-seconds 

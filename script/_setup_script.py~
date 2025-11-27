@@ -1,0 +1,36 @@
+import boa
+from moccasin.config import get_active_network, Network
+from boa.contracts.abi.abi_contract import ABIContract
+from typing import Tuple
+
+# Double check WBTC
+STARTING_WBTC_BALANCE = int(1e18)
+STARTING_USDC_BALANCE = int(100e6)
+
+def _add_eth_balance():
+    boa.env.set_balance(boa.env.eoa, STARTING_ETH_BALANCE)
+
+def _add_token_balance(usdc: ABIContract, weth: ABIContract, activate_network: Network):
+    print(f"USDC balance before: {usdc.balanceOf(boa.env.eoa)}")
+    weth.deposit(value=STARTING_WETH_BALANCE)
+    our_address = boa.env.eoa
+    with boa.env.prank(usdc.owner()):
+        usdc.updateMasterMinter(our_address)
+    usdc.configureMinter(our_address, STARTING_USDC_BALANCE)
+    usdc.mint(our_address, STARTING_USDC_BALANCE)
+    print(f"USDC balance after: {usdc.balanceOf(boa.env.eoa)}")
+
+def setup_script() -> Tuple[ABIContract, ABIContract, ABIContract, ABIContract]:
+    print("Starting setup script..")
+
+    active_network = get_active_network()
+
+    usdc = active_network.manifest_named("usdc")
+    wbtc = active_network.manifest_named("wbtc")
+
+    if active_network.is_local_or_forked_network():
+        _add_eth_balance()
+        _add_token_balance(usdc, wbtc, active_network)
+
+def moccasin_main():
+    setup_script()

@@ -2,6 +2,24 @@
 src = "src"
 out = "out"
 dot_env = ".env"
+save_abi_path = "abis"
+explorer_api_key = "$EXPLORER_API_KEY"
+default_network_name = "eth-forked"
+
+[networks.eth-forked]
+fork = true
+url = "$MAINNET_RPC_URL"
+default_account_name = "anvil1"
+
+[networks.contracts]
+usdc = "abis/usdc.json"
+wbtc = "abis/wbtc.json"
+uniswap_swap_router = "abis/uniswap_swap_router"
+
+[networks.eth-forked.contracts]
+uniswap_swap_router = {address = "0xE592427A0AEce92De3Edee1F18E0157C05861564"}
+wtbc = {address = "0xE592427A0AEce92De3Edee1F18E0157C05861564"}
+usdc = {address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"}
 
 [networks.pyevm]
 is_zksync = false
@@ -22,4 +40,3 @@ chain_id = 300
 is_zksync = true
 prompt_live = true
 
-# You can view all configuration options at https://cyfrin.github.io/moccasin/all_moccasin_toml_parameters.html

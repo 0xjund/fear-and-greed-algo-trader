@@ -1,13 +1,10 @@
 import boa
-from boa.contracts.abi.abi_contract import ABIContract
-from moccasin.config import get_active_network, get_config, _Networks
-from script._setup_script import setup_script
-from utils.api_client import daily_index_reading
+import time
+import config.config as config
+from moccasin.config import get_active_network
 
 SIX_DECIMALS = 1_000_000
 EIGHTEEN_DECIMALS = 1_000_000_000_000_000_000
-MIN_BALANCE_ETH = 0.05
-MIN_TRADE_SIZE = 0.01
 
 def get_price(feed_name: str) -> float:
     """Using the name of the price feed, we return an integer (no decimals) to get the
@@ -18,10 +15,6 @@ def get_price(feed_name: str) -> float:
     Returns:
         float: The price of the asset in USD
     """
-    # config = get_config()
-    # config._load_config(config.config_path)
-    # config.networks = _Networks(config._toml_data, config.project_root)
-
     # Get prices
     active_network = get_active_network()
     price_feed = active_network.manifest_named(feed_name)
@@ -30,22 +23,25 @@ def get_price(feed_name: str) -> float:
     decimals_normalized = 10**decimals
     return price / decimals_normalized
 
-def can_execute_trade(balance, trade_amount):
+def can_execute_trade(balance, trade_amount, get_price) -> bool:
     """Check to see if we can cover the ETH for trade and gas"""
-    # Check to see if I can get this through titanaboa
-    estimated_gas_cost = 0.01
+    gas_price = boa.env.get_gas_price()
+    gas_price_gwei = gas_price / 10**9
 
-    if balance < MIN_BALANCE_ETH:
-        print(f"Balance of: {balance} is too low, need a minimum balance of {MIN_BALANCE_ETH})")
+    if gas_price_gwei > config.MAX_GAS_PRICE_GWEI:
+        # Add log 
+        return False, "Gas Price too High"
+
+    if balance < config.MIN_BALANCE_ETH:
+        # Add log 
+        print(f"Balance of: {balance} is too low, need a minimum balance of {config.MIN_BALANCE_ETH})")
         return False
-
-    if trade_amount < MIN_TRADE_SIZE:
+    
+    if trade_amount < config.MIN_TRADE_SIZE:
+        # Add log
         print(f"The trade amount is too small: {trade_amount}")
         return False
-
-def check_daily_reading(int: daily_index_reading) -> bool:
-    pass 
- 
+        
 def swap_exact_input_single(
     swap_router,
     token_in_contract,
@@ -70,27 +66,18 @@ def swap_exact_input_single(
     # First approve router to spend token
     token_in_contract.approve(swap_router.address, amount_in)
 
-    # struct ExactInputSingleParams {
-    #     address tokenIn;
-    #     address tokenOut;
-    #     uint24 fee;
-    #     address recipient;
-    #     uint256 amountIn;
-    #     uint256 amountOutMinimum;
-    #     uint160 sqrtPriceLimitX96;
-    # }
+    deadline = int(time.time()) + 60
+    
     amount_out = swap_router.exactInputSingle(
         (
             token_in_contract.address,
             token_out_contract.address,
             pool_fee,
             boa.env.eoa,
+            deadline, 
             int(amount_in),
             int(amount_out_min),
             0,
         )
     )
     return amount_out
-
-def moccasin_main():
-    usdc, wbtc  = setup_script()

@@ -12,14 +12,14 @@ url = "$MAINNET_RPC_URL"
 default_account_name = "anvil1"
 
 [networks.contracts]
-usdc = "abis/usdc.json"
-wbtc = "abis/wbtc.json"
-uniswap_swap_router = "abis/uniswap_swap_router"
+usdc = { abi = "abis/usdc.json", external = true }
+wbtc = { abi = "abis/wbtc.json", external = true }
+uniswap_swap_router = { abi = "abis/uniswap_swap_router.json", external = true }
 
 [networks.eth-forked.contracts]
-uniswap_swap_router = {address = "0xE592427A0AEce92De3Edee1F18E0157C05861564"}
-wtbc = {address = "0xE592427A0AEce92De3Edee1F18E0157C05861564"}
-usdc = {address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"}
+usdc = { address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" }
+wbtc = { address = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" }
+uniswap_swap_router = { address = "0xE592427A0AEce92De3Edee1F18E0157C05861564" }
 
 [networks.pyevm]
 is_zksync = false
@@ -31,7 +31,7 @@ save_to_db = false
 chain_id = 31337
 
 [networks.sepolia]
-url = "https://ethereum-sepolia-rpc.publicnode.com"
+url = "$ "
 chain_id = 11155111
 
 [networks.zksync-sepolia]
@@ -39,4 +39,3 @@ url = "https://sepolia.era.zksync.dev"
 chain_id = 300
 is_zksync = true
 prompt_live = true
-
